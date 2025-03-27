@@ -51,19 +51,3 @@ resource "aws_db_instance" "this" {
     Name = "${var.name}-rds"
   }
 }
-module "rds" {
-  source                = "../modules/rds"
-  name                  = "prod"
-  db_name               = "mydb"
-  username              = "admin"
-  password              = "changeme1234!" # 민감정보! 실전에서는 secrets로 분리 추천
-  port                  = 3306
-  vpc_id                = module.prod_vpc.vpc_id
-  subnet_ids            = module.prod_vpc.private_subnet_ids
-  ecs_security_group_id = aws_security_group.ecs_sg.id
-}
-
-output "rds_endpoint" {
-  value = module.rds.endpoint
-}
-
