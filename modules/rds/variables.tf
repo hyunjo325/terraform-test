@@ -11,8 +11,7 @@ variable "username" {
 }
 
 variable "password" {
-  type      = string
-  sensitive = true
+  type = string
 }
 
 variable "port" {
@@ -20,15 +19,14 @@ variable "port" {
   default = 3306
 }
 
-variable "subnet_ids" {
-  type = list(string)
-}
-
 variable "vpc_id" {
   type = string
+}
+
+variable "subnet_ids" {
+  type = list(string)
 }
 
 variable "ecs_security_group_id" {
   type = string
 }
-
