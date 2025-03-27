@@ -39,15 +39,15 @@ resource "aws_subnet" "public" {
   }
 }
 
-resource "aws_subnet" "private" {
-  count             = length(var.azs)
-  vpc_id            = aws_vpc.this.id
-  cidr_block        = cidrsubnet(var.cidr_block, 4, count.index + 10)
-  availability_zone = var.azs[count.index]
-  tags = {
-    Name = "${var.name}-private-${count.index + 1}"
-  }
-}
+#resource "aws_subnet" "private" {
+#  count             = length(var.azs)
+#  vpc_id            = aws_vpc.this.id
+#  cidr_block        = cidrsubnet(var.cidr_block, 4, count.index + 10)
+#  availability_zone = var.azs[count.index]
+#  tags = {
+#    Name = "${var.name}-private-${count.index + 1}"
+#  }
+#}
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
@@ -55,17 +55,17 @@ resource "aws_route_table" "public" {
     Name = "${var.name}-public-rt"
   }
 }
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.this.id
-  tags = {
-    Name = "${var.name}-private-rt"
-  }
-}
-resource "aws_route" "nat_gateway" {
-  route_table_id         = aws_route_table.private.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.this.id
-}
+#resource "aws_route_table" "private" {
+#  vpc_id = aws_vpc.this.id
+#  tags = {
+#    Name = "${var.name}-private-rt"
+#  }
+#}
+#resource "aws_route" "nat_gateway" {
+#  route_table_id         = aws_route_table.private.id
+#  destination_cidr_block = "0.0.0.0/0"
+#  nat_gateway_id         = aws_nat_gateway.this.id
+#}
 resource "aws_route" "internet_access" {
   route_table_id         = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
@@ -77,11 +77,11 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
-resource "aws_route_table_association" "private" {
-  count          = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
-}
+#resource "aws_route_table_association" "private" {
+#  count          = length(aws_subnet.private)
+#  subnet_id      = aws_subnet.private[count.index].id
+#  route_table_id = aws_route_table.private.id
+#}
 
 # Public/Private 라우트 테이블에 Peering 연결 추가
 resource "aws_route" "peering_to_peer" {
@@ -126,4 +126,29 @@ resource "aws_route_table_association" "db_private" {
   count          = length(var.azs)
   subnet_id      = aws_subnet.db_private[count.index].id
   route_table_id = aws_route_table.private.id
+}
+resource "aws_route_table" "ecs_private" {
+  vpc_id = aws_vpc.this.id
+
+  tags = {
+    Name = "${var.name}-ecs-private-rt"
+  }
+}
+
+resource "aws_route" "ecs_nat_gateway" {
+  route_table_id         = aws_route_table.ecs_private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.this.id
+}
+
+resource "aws_route_table_association" "ecs_private" {
+  count          = length(aws_subnet.ecs_private)
+  subnet_id      = aws_subnet.ecs_private[count.index].id
+  route_table_id = aws_route_table.ecs_private.id
+}
+
+resource "aws_route_table_association" "db_private" {
+  count          = length(aws_subnet.db_private)
+  subnet_id      = aws_subnet.db_private[count.index].id
+  route_table_id = aws_route_table.db_private.id
 }
