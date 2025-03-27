@@ -1,10 +1,13 @@
 # prod/main.tf
 data "terraform_remote_state" "dev" {
-  backend = "local"  # 또는 "s3" (remote backend 쓸 경우)
+  backend = "s3"
   config = {
-    path = "../dev/terraform.tfstate"
+    bucket = "terraform-evan-tfstate"
+    key    = "dev/terraform.tfstate"
+    region = "ap-northeast-2"
   }
 }
+
 
 module "prod_vpc" {
   source     = "../modules/vpc"
