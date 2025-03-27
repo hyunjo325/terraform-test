@@ -24,11 +24,20 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-      - name: Terraform Init
+      # Step 1: Apply remote-backend (S3 + DynamoDB)
+      - name: Init remote-backend
+        working-directory: ./remote-backend
+        run: terraform init
+
+      - name: Apply remote-backend (one-time setup)
+        working-directory: ./remote-backend
+        run: terraform apply -auto-approve
+
+      # Step 2: Deploy dev infra
+      - name: Init dev
         working-directory: ./dev
         run: terraform init
 
-      - name: Terraform Apply
+      - name: Apply dev
         working-directory: ./dev
         run: terraform apply -auto-approve
-
