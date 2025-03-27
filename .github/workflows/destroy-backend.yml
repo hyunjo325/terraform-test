@@ -1,7 +1,7 @@
-name: Destroy Prod Infrastructure
+name: Destroy Remote Backend
 
 on:
-  workflow_dispatch:  # 수동 실행 전용
+  workflow_dispatch:
 
 jobs:
   destroy:
@@ -23,10 +23,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Terraform Init (prod)
-        working-directory: ./prod
+      - name: Terraform Init
+        working-directory: ./remote-backend
         run: terraform init
 
-      - name: Terraform Destroy (prod)
-        working-directory: ./prod
+      - name: Terraform Destroy
+        working-directory: ./remote-backend
         run: terraform destroy -auto-approve
