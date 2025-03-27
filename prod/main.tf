@@ -121,7 +121,7 @@ module "ecs_backend" {
   family            = "prod-backend-task"
   service_name      = "prod-backend-service"
   container_name    = "backend"
-  image             = "module.ecr_backend.repository_url"
+  image             = "390403876841.dkr.ecr.ap-northeast-2.amazonaws.com/prod-backend:latest"
   cpu               = "256"
   memory            = "512"
   container_port    = 80
