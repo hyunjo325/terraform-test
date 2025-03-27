@@ -36,3 +36,10 @@ variable "route_table_ids_to_update" {
   default     = []
 }
 
+variable "ecs_private_subnet_cidrs" {
+  type = list(string)
+}
+
+variable "db_private_subnet_cidrs" {
+  type = list(string)
+}
