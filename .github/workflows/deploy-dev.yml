@@ -24,16 +24,29 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-      # Step 1: Apply remote-backend (S3 + DynamoDB)
+
+      #  Step 1: Check if remote-backend bucket exists
+      - name: Check if remote-backend bucket exists
+        id: check_backend
+        run: |
+          if aws s3 ls "s3://terraform-evan-tfstate" 2>&1 | grep -q 'NoSuchBucket'; then
+            echo "backend_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "backend_exists=true" >> $GITHUB_OUTPUT
+          fi
+
+      #  Step 2: Apply remote-backend only if it doesn't exist
       - name: Init remote-backend
+        if: steps.check_backend.outputs.backend_exists == 'false'
         working-directory: ./remote-backend
         run: terraform init
 
-      - name: Apply remote-backend (one-time setup)
+      - name: Apply remote-backend
+        if: steps.check_backend.outputs.backend_exists == 'false'
         working-directory: ./remote-backend
         run: terraform apply -auto-approve
 
-      # Step 2: Deploy dev infra
+      #  Step 3: Deploy dev infrastructure
       - name: Init dev
         working-directory: ./dev
         run: terraform init
