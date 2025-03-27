@@ -1,10 +1,9 @@
-provider "aws" {
-  region = "ap-northeast-2"
-}
-
 resource "aws_s3_bucket" "tfstate" {
   bucket = "terraform-evan-tfstate"
-  force_destroy = true
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = all
+  }
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {
@@ -17,8 +16,8 @@ resource "aws_dynamodb_table" "terraform_locks" {
     type = "S"
   }
 
-  tags = {
-    Name        = "Terraform Lock Table"
-    Environment = "global"
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = all
   }
 }
