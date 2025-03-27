@@ -116,17 +116,6 @@ resource "aws_subnet" "db_private" {
     Name = "${var.name}-db-private-${count.index + 1}"
   }
 }
-resource "aws_route_table_association" "ecs_private" {
-  count          = length(var.azs)
-  subnet_id      = aws_subnet.ecs_private[count.index].id
-  route_table_id = aws_route_table.private.id
-}
-
-resource "aws_route_table_association" "db_private" {
-  count          = length(var.azs)
-  subnet_id      = aws_subnet.db_private[count.index].id
-  route_table_id = aws_route_table.private.id
-}
 resource "aws_route_table" "ecs_private" {
   vpc_id = aws_vpc.this.id
 
