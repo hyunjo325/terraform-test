@@ -17,6 +17,8 @@ module "prod_vpc" {
   # prod VPC → dev VPC 라우팅 설정
   peer_cidr_block           = "10.10.0.0/16" # dev VPC의 CIDR
   route_table_ids_to_update = module.prod_vpc.public_route_table_ids
+  ecs_private_subnet_cidrs = ["10.20.32.0/20", "10.20.48.0/20"]
+  db_private_subnet_cidrs  = ["10.20.64.0/20", "10.20.80.0/20"]
 }
 module "prod_alb" {
   source             = "../modules/alb"
@@ -126,7 +128,7 @@ module "ecs_backend" {
   memory            = "512"
   container_port    = 80
   vpc_id            = module.prod_vpc.vpc_id
-  subnet_ids        = module.prod_vpc.private_subnet_ids
+  subnet_ids        = module.prod_vpc.ecs_private_subnet_ids
   security_group_id = aws_security_group.ecs_sg.id
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 
@@ -179,7 +181,7 @@ module "rds" {
   password              = "changeme1234!"
   port                  = 3306
   vpc_id                = module.prod_vpc.vpc_id
-  subnet_ids            = module.prod_vpc.private_subnet_ids
+  subnet_ids            = module.prod_vpc.db_private_subnet_ids
   ecs_security_group_id = aws_security_group.ecs_sg.id
 }
 
