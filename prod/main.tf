@@ -203,7 +203,7 @@ module "cpu_alarm_backend" {
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 50
+  threshold           = 30
   period              = 60
   evaluation_periods  = 2
   slack_webhook_url = var.slack_webhook_url
