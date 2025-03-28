@@ -135,3 +135,21 @@ resource "aws_route_table_association" "ecs_private" {
   subnet_id      = aws_subnet.ecs_private[count.index].id
   route_table_id = aws_route_table.ecs_private.id
 }
+resource "aws_route_table" "db_private" {
+  vpc_id = aws_vpc.this.id
+  tags = {
+    Name = "${var.name}-db-private-rt"
+  }
+}
+
+resource "aws_route" "db_nat_gateway" {
+  route_table_id         = aws_route_table.db_private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.this.id
+}
+
+resource "aws_route_table_association" "db_private" {
+  count          = length(aws_subnet.db_private)
+  subnet_id      = aws_subnet.db_private[count.index].id
+  route_table_id = aws_route_table.db_private.id
+}
