@@ -242,12 +242,12 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 
 resource "aws_lambda_function" "slack_notifier" {
   function_name = "slack-alarm-notifier"
-  filename      = "lambda_function_payload.zip"
+  filename      = "${path.module}/../lambda/lambda.zip"
   handler       = "index.lambda_handler"
   runtime       = "python3.11"
   role          = aws_iam_role.lambda_exec_role.arn
 
-  source_code_hash = filebase64sha256("lambda_function_payload.zip")
+  source_code_hash = filebase64sha256("${path.module}/../lambda/lambda.zip")
 
   environment {
     variables = {
@@ -259,6 +259,7 @@ resource "aws_lambda_function" "slack_notifier" {
     Name = "slack-alarm-notifier"
   }
 }
+
 
 resource "aws_sns_topic_subscription" "lambda_alert" {
   topic_arn = aws_sns_topic.alerts.arn
