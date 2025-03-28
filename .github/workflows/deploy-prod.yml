@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
-env:
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
       - name: Checkout code

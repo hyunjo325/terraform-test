@@ -215,8 +215,9 @@ module "cpu_alarm_backend" {
 }
 
 module "notifications" {
-  source          = "../modules/notifications"
-  sns_topic_name  = "alarm-topic"
+  source = "../modules/notifications"
+
+  slack_webhook_url = var.slack_webhook_url
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
@@ -250,7 +251,7 @@ resource "aws_lambda_function" "slack_notifier" {
 
   environment {
     variables = {
-      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"  # 직접 입력 가능하지만 민감 정보는 피하는 걸 추천
+      SLACK_WEBHOOK_URL = var.slack_webhook_url
     }
   }
 
