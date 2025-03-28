@@ -66,6 +66,9 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       }
     ]
   })
+  lifecycle {
+    ignore_changes = [name]
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_attach" {
