@@ -17,9 +17,8 @@ module "prod_vpc" {
   # prod VPC → dev VPC 라우팅 설정
   peer_cidr_block           = "10.10.0.0/16" # dev VPC의 CIDR
   route_table_ids_to_update = module.prod_vpc.public_route_table_ids
-  ecs_private_subnet_cidrs = ["10.20.32.0/20", "10.20.48.0/20"]
-  db_private_subnet_cidrs  = ["10.20.64.0/20", "10.20.80.0/20"]
 }
+
 module "prod_alb" {
   source             = "../modules/alb"
   name               = "prod"
@@ -187,5 +186,21 @@ module "rds" {
 
 output "rds_endpoint" {
   value = module.rds.endpoint
+}
+
+module "cpu_alarm_backend" {
+  source              = "../modules/cloudwatch"
+  alarm_name          = "prod-backend-cpu-alarm"
+  namespace           = "AWS/ECS"
+  metric_name         = "CPUUtilization"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 50
+  period              = 60
+  evaluation_periods  = 2
+  dimensions = {
+    ClusterName = "prod-cluster"
+    ServiceName = "prod-backend-service"
+  }
+  alarm_actions = [aws_sns_topic.alerts.arn]
 }
 
