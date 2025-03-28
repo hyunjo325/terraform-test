@@ -4,6 +4,9 @@ module "dev_vpc" {
   name       = "dev"
   cidr_block = "10.10.0.0/16"
   azs        = ["ap-northeast-2a", "ap-northeast-2c"]
+
+  ecs_private_subnet_cidrs = ["10.10.128.0/20", "10.10.144.0/20"]
+  db_private_subnet_cidrs  = ["10.10.160.0/20", "10.10.176.0/20"]
 }
 module "dev_alb" {
   source             = "../modules/alb"

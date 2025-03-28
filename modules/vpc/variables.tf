@@ -37,9 +37,9 @@ variable "route_table_ids_to_update" {
 }
 
 variable "ecs_private_subnet_cidrs" {
-  type = list(string)
+  type = aws_subnet.ecs_private[*].id
 }
 
 variable "db_private_subnet_cidrs" {
-  type = list(string)
+  type = aws_subnet.db_private[*].id
 }
