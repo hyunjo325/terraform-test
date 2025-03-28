@@ -14,6 +14,8 @@ module "prod_vpc" {
   name       = "prod"
   cidr_block = "10.20.0.0/16"
   azs        = ["ap-northeast-2a", "ap-northeast-2c"]
+  ecs_private_subnet_cidrs = ["10.20.32.0/20", "10.20.48.0/20"]
+  db_private_subnet_cidrs  = ["10.20.64.0/20", "10.20.80.0/20"]
   # prod VPC → dev VPC 라우팅 설정
   peer_cidr_block           = "10.10.0.0/16" # dev VPC의 CIDR
   route_table_ids_to_update = module.prod_vpc.public_route_table_ids
