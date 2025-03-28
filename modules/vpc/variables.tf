@@ -37,9 +37,11 @@ variable "route_table_ids_to_update" {
 }
 
 variable "ecs_private_subnet_cidrs" {
-  type = aws_subnet.ecs_private[*].id
+  description = "CIDR blocks for ECS private subnets"
+  type        = list(string)
 }
 
 variable "db_private_subnet_cidrs" {
-  type = aws_subnet.db_private[*].id
+  description = "CIDR blocks for DB private subnets"
+  type        = list(string)
 }
