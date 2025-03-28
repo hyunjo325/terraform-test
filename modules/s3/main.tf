@@ -4,6 +4,9 @@ resource "aws_s3_bucket" "this" {
   tags = {
     Name = var.name
   }
+  lifecycle {
+    prevent_destroy = false
+  }
 }
 
 resource "aws_s3_bucket_website_configuration" "this" {
