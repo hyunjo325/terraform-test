@@ -128,7 +128,7 @@ module "ecs_ai" {
   memory             = "512"
   container_port     = 80
   vpc_id             = module.dev_vpc.vpc_id
-  subnet_ids         = module.dev_vpc.ai_private_subnet_ids
+  subnet_ids         = module.dev_vpc.ecs_private_subnet_ids
   security_group_id  = aws_security_group.ecs_sg.id
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 
