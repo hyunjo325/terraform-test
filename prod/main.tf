@@ -189,6 +189,9 @@ module "rds" {
 output "rds_endpoint" {
   value = module.rds.endpoint
 }
+resource "aws_sns_topic" "alerts" {
+  name = "alarm-topic"
+}
 
 module "cpu_alarm_backend" {
   source              = "../modules/cloudwatch"
@@ -205,4 +208,5 @@ module "cpu_alarm_backend" {
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
 }
+
 

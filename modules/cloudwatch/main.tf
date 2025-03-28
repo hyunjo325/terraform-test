@@ -17,10 +17,3 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   }
 }
 
-module "cpu_alarm_backend" {
-  source         = "../modules/cloudwatch"
-  name           = "prod-backend"
-  cluster_name   = "prod-cluster"
-  service_name   = "prod-backend-service"
-  alarm_actions  = [aws_sns_topic.alerts.arn] 
-}
