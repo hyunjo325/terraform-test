@@ -206,6 +206,7 @@ module "cpu_alarm_backend" {
   threshold           = 50
   period              = 60
   evaluation_periods  = 2
+  slack_webhook_url = var.slack_webhook_url
   dimensions = {
     ClusterName = "prod-cluster"
     ServiceName = "prod-backend-service"
