@@ -48,3 +48,7 @@ variable "alarm_actions" {
   description = "알람 발생 시 실행할 SNS 주제 ARN 목록"
   default     = []
 }
+variable "slack_webhook_url" {
+  description = "Slack Webhook URL for alarm notifications"
+  type        = string
+}

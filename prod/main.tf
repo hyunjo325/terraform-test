@@ -213,4 +213,80 @@ module "cpu_alarm_backend" {
   alarm_actions = [aws_sns_topic.alerts.arn]
 }
 
+module "notifications" {
+  source          = "../modules/notifications"
+  sns_topic_name  = "alarm-topic"
+}
 
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "lambda-slack-exec-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_lambda_function" "slack_notifier" {
+  function_name = "slack-alarm-notifier"
+  filename      = "lambda_function_payload.zip"
+  handler       = "index.lambda_handler"
+  runtime       = "python3.11"
+  role          = aws_iam_role.lambda_exec_role.arn
+
+  source_code_hash = filebase64sha256("lambda_function_payload.zip")
+
+  environment {
+    variables = {
+      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"  # 직접 입력 가능하지만 민감 정보는 피하는 걸 추천
+    }
+  }
+
+  tags = {
+    Name = "slack-alarm-notifier"
+  }
+}
+
+resource "aws_sns_topic_subscription" "lambda_alert" {
+  topic_arn = aws_sns_topic.alerts.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.slack_notifier.arn
+}
+
+resource "aws_lambda_permission" "allow_sns" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.slack_notifier.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.alerts.arn
+}
+resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
+  alarm_name          = "prod-backend-cpu-alarm"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 50
+  alarm_description   = "Triggered when ECS CPU > 50%"
+  actions_enabled     = true
+
+  dimensions = {
+    ClusterName = "prod-cluster"
+    ServiceName = "prod-backend-service"
+  }
+
+  alarm_actions = [aws_sns_topic.alerts.arn]
+}
