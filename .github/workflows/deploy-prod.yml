@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
   terraform:
@@ -31,5 +33,8 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ./prod
+        env:
+          TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: terraform apply -auto-approve
+    
 
